@@ -33,9 +33,9 @@ const unsigned long dbEncoderDelay = 5000;  // Encoder Debounce (microseconds)
 unsigned long lastButtonTime = 0; 
 const unsigned long dbButtonDelay = 20000;  // Button Debounce (microseconds)
 
-// button and knob last state globals for checkInputs()
-bool lastButton = false;
+// knob last position global for checkInputs()
 long lastPos = 0;
+bool lastButton = false;
 
 // Tracklist
 const char* menuItems[] = {
@@ -63,21 +63,18 @@ enum State {
   TRACK,
 };
 
-State displayState = MAIN_MENU;
-State lastDisplayState = MAIN_MENU;
+State displayState = INIT;
+State lastDisplayState = INIT;
 
 void setup() {
-  // Serial.begin(115200);
-
   pinMode(BT_PIN, INPUT_PULLUP);
 
   tft.reset();
   uint16_t ID = tft.readID();
   tft.begin(ID);
   tft.setRotation(0);
-
-  drawMainMenuBG();
-  drawMainMenu();
+  
+  displayState = MAIN_MENU;
 }
 
 void loop() {
@@ -86,9 +83,15 @@ void loop() {
 
   switch (displayState) {
     case (MAIN_MENU) :
-      if(req.button) {
+      if(req.button)  
+      { 
+        // change display state, do nothing with any potential knob input
+        // if button and knob trigger simultaneuously, knob motion assumed unintended by user
+        // (i.e. knob rotated by act of pressing button)
         displayState = TRACK;
-      } else {
+      } 
+      else 
+      {
         mainMenuPos += req.knob;
         mainMenuPos = constrain(mainMenuPos, 0, numMainMenuItems-1);
 
@@ -113,9 +116,15 @@ void loop() {
       break;
 
     case (TRACK) :
-      if (req.button) {
+      if (req.button) 
+      {
+        // change display state, do nothing with any potential knob input
+        // if button and knob trigger simultaneuously, knob motion assumed unintended by user
+        // (i.e. knob rotated by act of pressing button)
         displayState = MAIN_MENU;
-      } else {
+      } 
+      else 
+      {
         if (lastDisplayState != displayState) // moving to sub menu
         { 
           // draw everything
@@ -135,7 +144,7 @@ void checkInputs() {
 
   if (currentButton != lastButton) {
     if (currentTime - lastButtonTime > dbButtonDelay) {
-      req.button = true;
+      req.button = currentButton;
       lastButtonTime = currentTime;
       lastButton = currentButton;
     }
