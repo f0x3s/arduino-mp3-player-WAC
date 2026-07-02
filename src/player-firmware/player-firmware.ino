@@ -10,6 +10,8 @@
 #include <Adafruit_GFX.h>
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
+#include "testTrackDisplayNames.h" // #include "trackDisplayNames.h"
+
 
 // Color Definitions
 #define BLACK   0x0000
@@ -18,6 +20,8 @@
 #define RED     0xF800
 #define GREEN   0x07E0
 #define GRAY    0x5AEB
+
+
 
 // Initialize TFT
 MCUFRIEND_kbv tft;
@@ -38,14 +42,7 @@ const unsigned long dbButtonDelay = 20000;  // Button Debounce (microseconds)
 long lastPos = 0;
 bool lastButton = false;
 
-// Tracklist
-const char* menuItems[] = {
-  "1. Track 1",
-  "2. Track 2",
-  "3. Track 3",
-  "4. Track 4",
-  "5. Track 5"
-};
+// Tracklist located in trackDisplayNames.h
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
 
 // main menu position tracking globals
