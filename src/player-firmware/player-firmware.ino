@@ -49,8 +49,9 @@ const char* menuItems[] = {
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
 
 // main menu position tracking globals
-int mainMenuPos = 0;
-int lastMainMenuPos = 0;
+int randomMainMenuStart;
+int mainMenuPos;
+int lastMainMenuPos;
 
 struct Request {
   bool button;
@@ -75,6 +76,10 @@ SparkFunMY1690 mp3;
 
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
+  randomSeed(analogRead(A0)); 
+
+  mainMenuPos = random(numMainMenuItems); // select random track, so not all players start on the same one
+  lastMainMenuPos = mainMenuPos;
 
   tft.reset();
   uint16_t ID = tft.readID();
@@ -104,6 +109,8 @@ void setup() {
   mp3.setPlayModeSingle();
 
   if (displayState != ERROR) displayState = MAIN_MENU;
+
+  displayState = MAIN_MENU;
 
 }
 
