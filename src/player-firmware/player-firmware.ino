@@ -57,14 +57,17 @@ struct Request {
 };
 Request req = {false, 0};
 
+
 enum State {
-  INIT,
+  ERROR,
   MAIN_MENU,
   TRACK,
 };
 
-State displayState = INIT;
-State lastDisplayState = INIT;
+State displayState = ERROR;
+State lastDisplayState = ERROR;
+
+String error = "";
 
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
@@ -133,6 +136,23 @@ void loop() {
         } 
       }
       break;
+    
+    case (ERROR) :
+      if (lastDisplayState != displayState) // moving to error from other screen 
+      { 
+          // draw everything
+          drawError();
+          lastDisplayState = displayState;
+      } 
+      break;
+
+    default :
+      displayState = ERROR;
+      lastDisplayState = ERROR;
+      error = "unknown display state\n...how did you get here?";
+      drawError();
+      break;
+
   }
 }
 
@@ -197,4 +217,28 @@ void drawSubMenu() {
   tft.setTextSize(2);
   tft.setCursor(20, 180);
   tft.println("Press Knob to Return");
+}
+
+void drawError() {
+  tft.fillScreen(RED);
+  tft.setTextColor(BLACK);
+  tft.setTextSize(4);
+  tft.setCursor(20, 40);
+  tft.print("ERROR");
+  tft.setTextSize(2);
+  tft.setCursor(20, 80);
+  tft.print("We've run into an issue");
+  tft.setCursor(20, 120);
+  tft.print("Please Alert Nearby");
+  tft.setCursor(20, 140);
+  tft.print("Gallery Attendant");
+
+  int16_t  x1, y1;
+  uint16_t w, h;
+
+  tft.getTextBounds(error,0,0,&x1, &y1, &w, &h);
+  tft.setCursor(20, 440-h);
+  tft.print("Log: ");
+  tft.setCursor(20, 460-h);
+  tft.print(error);
 }
