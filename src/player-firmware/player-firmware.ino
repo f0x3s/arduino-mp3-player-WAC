@@ -9,6 +9,7 @@
 #include <MCUFRIEND_kbv.h>
 #include <Adafruit_GFX.h>
 #include <Encoder.h>
+#include "SparkFun_MY1690_MP3_Library.h"
 
 // Color Definitions
 #define BLACK   0x0000
@@ -62,12 +63,15 @@ enum State {
   ERROR,
   MAIN_MENU,
   TRACK,
+  INIT,
 };
 
 State displayState = ERROR;
-State lastDisplayState = ERROR;
+State lastDisplayState = INIT;
 
 String error = "";
+
+SparkFunMY1690 mp3;
 
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
@@ -77,7 +81,30 @@ void setup() {
   tft.begin(ID);
   tft.setRotation(0);
   
-  displayState = MAIN_MENU;
+  Serial3.begin(9600);
+
+  if (mp3.begin(Serial3) == false) // Begin Player
+  {
+    error = "mp3 device not detected";
+    displayState = ERROR;
+  }
+
+  int trackCount = mp3.getSongCount(); // Fetch Track Count
+  if (trackCount == 0)
+  {
+    error =  "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
+    displayState = ERROR;
+  } else if (trackCount != numMainMenuItems)
+  {
+    error =  "Track and menu item\n   count mismatch";
+    displayState = ERROR;
+  }
+
+  mp3.setVolume(15);
+  mp3.setPlayModeSingle();
+
+  if (displayState != ERROR) displayState = MAIN_MENU;
+
 }
 
 void loop() {
