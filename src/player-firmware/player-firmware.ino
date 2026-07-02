@@ -12,7 +12,6 @@
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
 
-
 // Color Definitions
 #define BLACK 0x0000
 #define WHITE 0xFFFF
@@ -42,6 +41,7 @@ bool lastButton = false;
 
 // Tracklist located in trackDisplayNames.h
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
+const TRACKS_PER_PAGE = 10;
 
 // main menu position tracking globals
 int randomMainMenuStart;
@@ -53,7 +53,6 @@ struct Request {
   int knob;
 };
 Request req = { false, 0 };
-
 
 enum State {
   ERROR,
@@ -126,7 +125,6 @@ void loop() {
         if (lastDisplayState != displayState)  // moving to main menu from other screen
         {
           // draw everything
-          drawMainMenuBG();
           drawMainMenu();
           lastDisplayState = displayState;
         }
@@ -134,7 +132,7 @@ void loop() {
         else if (mainMenuPos != lastMainMenuPos)  // change in highlghted menu item
         {
           // update selection
-          drawMainMenu();
+          drawMainMenuUpdate();
           lastMainMenuPos = mainMenuPos;
         } else {
           // no change, do nothing
@@ -154,7 +152,7 @@ void loop() {
         {
           // draw everything
           drawSubMenu();
-          mp3.playTrackNumber(mainMenuPos);
+          mp3.playTrackNumber(mainMenuPos+1);
           lastDisplayState = displayState;
         }
       }
@@ -201,17 +199,16 @@ void checkInputs() {
   }
 }
 
-void drawMainMenuBG() {
+void drawMainMenu() {
   tft.fillScreen(BLACK);
   tft.setTextColor(WHITE);
   tft.setTextSize(3);
   tft.setCursor(20, 20);
   tft.println("TRACK LISTING");
   tft.drawFastHLine(20, 55, 280, RED);
-}
 
-void drawMainMenu() {
   tft.setTextSize(2);
+  
   for (int i = 0; i < numMainMenuItems; i++) {
     int yPos = 80 + (i * 35);
     if (i == mainMenuPos) {
@@ -221,9 +218,26 @@ void drawMainMenu() {
       tft.fillRect(15, yPos - 5, 290, 28, BLACK);
       tft.setTextColor(WHITE);
     }
+
     tft.setCursor(25, yPos);
     tft.println(menuItems[i]);
   }
+}
+
+void drawMainMenuUpdate() {
+  tft.setTextSize(2);
+
+  int yPos = 80 + (lastMainMenuPos * 35);
+  tft.fillRect(15, yPos - 5, 290, 28, BLACK);
+  tft.setCursor(25, yPos);
+  tft.setTextColor(WHITE);
+  tft.println(menuItems[lastMainMenuPos]);
+
+  yPos = 80 + (mainMenuPos * 35);
+  tft.fillRect(15, yPos - 5, 290, 28, BLUE);
+  tft.setTextColor(WHITE);
+  tft.setCursor(25, yPos);
+  tft.println(menuItems[mainMenuPos]);
 }
 
 void drawSubMenu() {
