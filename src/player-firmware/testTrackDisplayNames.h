@@ -8,7 +8,7 @@ const char* menuItems[] = {
   "7. Liszt 7",
   "8. Liszt 8",
   "9. Liszt 9",
-  "10. Liszt 10"
+  "10. Liszt 10",
   "11. Liszt 11",
   "12 Liszt 12"
 };
