@@ -33,6 +33,7 @@ const unsigned long dbEncoderDelay = 5000;  // Encoder Debounce (microseconds)
 unsigned long lastButtonTime = 0; 
 const unsigned long dbButtonDelay = 20000;  // Button Debounce (microseconds)
 
+// button and knob last state globals for checkInputs()
 bool lastButton = false;
 long lastPos = 0;
 
@@ -44,7 +45,9 @@ const char* menuItems[] = {
   "4. Track 4",
   "5. Track 5"
 };
-int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]); 
+int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
+
+// main menu position tracking globals
 int mainMenuPos = 0;
 int lastMainMenuPos = 0;
 
@@ -52,7 +55,6 @@ struct Request {
   bool button;
   int knob;
 };
-
 Request req = {false, 0};
 
 enum State {
@@ -131,10 +133,11 @@ void checkInputs() {
   bool currentButton = (digitalRead(BT_PIN) == LOW);
   long currentPos = knob.read();
 
-  if (currentButton) {
+  if (currentButton != lastButton) {
     if (currentTime - lastButtonTime > dbButtonDelay) {
       req.button = true;
       lastButtonTime = currentTime;
+      lastButton = currentButton;
     }
   }
 
