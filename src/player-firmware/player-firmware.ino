@@ -107,7 +107,7 @@ void setup() {
 
   if (displayState != ERROR) displayState = MAIN_MENU;
 
-  displayState = MAIN_MENU;
+  //displayState = MAIN_MENU;
 
 }
 
