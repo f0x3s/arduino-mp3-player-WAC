@@ -13,14 +13,6 @@
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
 #include "styleSheet.h"
 
-// Color Definitions
-#define BLACK 0x0000
-#define WHITE 0xFFFF
-#define BLUE 0x001F
-#define RED 0xF800
-#define GREEN 0x07E0
-#define GRAY 0x5AEB
-
 // Initialize TFT
 MCUFRIEND_kbv tft;
 
@@ -270,24 +262,26 @@ void checkInputs() {
     }
   }
 }
+
+
 void drawMainMenuBG() {
-  tft.fillScreen(BLACK);
-  tft.setTextColor(WHITE);
+  tft.fillScreen(MM_BG_C);
+  tft.setTextColor(MM_H_TXT_C);
   tft.setTextSize(3);
   tft.setCursor(20, 20);
   tft.println("TRACK LISTING");
-  tft.drawFastHLine(20, 55, 280, RED);
+  tft.drawFastHLine(20, 55, 280, MM_H_HR_C);
 
   tft.setTextSize(2);
   tft.setCursor(20, 440);
-  tft.setTextColor(GRAY);
+  tft.setTextColor(MM_PC_C);
   tft.print("Page ");
   tft.print((currentPage / 10) + 1);
   tft.print(" of ");
   tft.print((getPage(numMainMenuItems) / 10) + 1);
 
   tft.setCursor(20, 460);
-  tft.setTextColor(GREEN);
+  tft.setTextColor(MM_NP_C);
   String nowPlaying = String(menuItems[mainMenuPos]);
   tft.println("NOW PLAYING: " + nowPlaying);
 }
@@ -301,10 +295,10 @@ void drawMainMenu() {
     if (index >= numMainMenuItems) break;
 
     if (index == mainMenuPos) {
-      tft.fillRect(15, yPos - 5, 290, 28, BLUE);
+      tft.fillRect(15, yPos - 5, 290, 28, MM_HL_C);
     }
 
-    tft.setTextColor(WHITE);
+    tft.setTextColor(MM_TXT_C);
     tft.setCursor(25, yPos);
     tft.print(index + 1);
     tft.print(". ");
@@ -323,10 +317,10 @@ void drawMainMenuUpdate() {
       int index = lastPage + i;
       yPos = 80 + (i * 35);
       if(index == lastMainMenuPos) {
-        tft.fillRect(15, yPos - 5, 290, 28, BLACK);
+        tft.fillRect(15, yPos - 5, 290, 28, MM_BG_C);
       } else {
         tft.setCursor(25, yPos);
-        tft.setTextColor(BLACK);
+        tft.setTextColor(MM_BG_C);
         tft.print(index + 1);
         tft.print(". ");
         tft.println(menuItems[index]);
@@ -341,14 +335,11 @@ void drawMainMenuUpdate() {
     tft.getTextBounds("Page ", 0, 0, &x1, &y1, &w, &h);
 
     tft.setCursor(20+w, 440);
-    tft.setTextColor(BLACK);
+    tft.setTextColor(MM_BG_C);
     tft.print((lastPage / 10) + 1);
-    //tft.fillRect(20, 440, 140, 12, BLACK);
+ 
     tft.setCursor(20, 440);
-
-
-    
-    tft.setTextColor(GRAY);
+    tft.setTextColor(MM_PC_C);
     tft.print("Page ");
     tft.print((currentPage / 10) + 1);
     tft.print(" of ");
@@ -357,16 +348,16 @@ void drawMainMenuUpdate() {
 
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(15, yPos - 5, 290, 28, BLACK);
+    tft.fillRect(15, yPos - 5, 290, 28, MM_BG_C);
     tft.setCursor(25, yPos);
-    tft.setTextColor(WHITE);
+    tft.setTextColor(MM_TXT_C);
     tft.print(lastMainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[lastMainMenuPos]);
 
     yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(15, yPos - 5, 290, 28, BLUE);
-    tft.setTextColor(WHITE);
+    tft.fillRect(15, yPos - 5, 290, 28, MM_HL_C);
+    tft.setTextColor(MM_TXT_C);
     tft.setCursor(25, yPos);
     tft.print(mainMenuPos + 1);
     tft.print(". ");
@@ -375,26 +366,27 @@ void drawMainMenuUpdate() {
 }
 
 void drawSubMenu() {
-  tft.fillScreen(BLACK);
-  tft.setTextColor(GREEN);
+  tft.fillScreen(SM_BG_C);
+  tft.setTextColor(SM_H_C);
   tft.setTextSize(3);
   tft.setCursor(20, 40);
   tft.print("Opened:\n  ");
   tft.print(mainMenuPos + 1);
   tft.print(". ");
   tft.println(menuItems[mainMenuPos]);
-  tft.setTextColor(WHITE);
+  tft.setTextColor(SM_RET_C);
   tft.setTextSize(2);
   tft.setCursor(20, 180);
   tft.println("Press Knob to Return");
 }
 
 void drawError() {
-  tft.fillScreen(RED);
-  tft.setTextColor(BLACK);
+  tft.fillScreen(ER_BG_C);
+  tft.setTextColor(ER_H_TXT_C);
   tft.setTextSize(4);
   tft.setCursor(20, 40);
   tft.print("ERROR");
+  tft.setTextColor(ER_SH_TXT_C);
   tft.setTextSize(2);
   tft.setCursor(20, 80);
   tft.print("We've run into an issue");
@@ -405,7 +397,7 @@ void drawError() {
 
   int16_t x1, y1;
   uint16_t w, h;
-
+  tft.setTextColor(ER_LG_TXT_C);
   tft.getTextBounds(error, 0, 0, &x1, &y1, &w, &h);
   tft.setCursor(20, 440 - h);
   tft.print("Log: ");
