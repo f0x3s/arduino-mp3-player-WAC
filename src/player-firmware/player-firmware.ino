@@ -69,6 +69,9 @@ State lastDisplayState = INIT;
 String error = "";
 
 SparkFunMY1690 mp3;
+const int CD_PIN = 23;
+
+bool lastCard = true;
 
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
@@ -86,21 +89,14 @@ void setup() {
   tft.setRotation(0);
 
   Serial3.begin(9600);
+  pinMode(CD_PIN, INPUT_PULLUP);
 
   if (!mp3.begin(Serial3))  // Begin Player
   {
     error = "mp3 device not detected";
     displayState = ERROR;
   } else {
-    int trackCount = mp3.getSongCount();  // Fetch Track Count
-
-    if (trackCount == 0) {
-      error = "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
-      displayState = ERROR;
-    } else if (trackCount != numMainMenuItems) {
-      error = "Track and menu item\n   count mismatch";
-      displayState = ERROR;
-    }
+    checkTrackCount();
 
     mp3.setVolume(30);
     mp3.setPlayModeSingle();
@@ -115,6 +111,7 @@ void setup() {
 void loop() {
   req = { false, 0 };
   checkInputs();
+  checkCard();
 
   switch (displayState) {
     case (MAIN_MENU):
@@ -169,7 +166,7 @@ void loop() {
 
           // send play command if new track
           int currentTrack = mp3.getTrackNumber() - 1;
-          if (mainMenuPos != currentTrack){
+          if (mainMenuPos != currentTrack) {
             mp3.playTrackNumber(mainMenuPos + 1);
           }
 
@@ -195,6 +192,59 @@ void loop() {
       break;
   }
 }
+int checkTrackCount() {
+  int trackCount = mp3.getSongCount();  // Fetch Track Count
+
+    if (trackCount == 0) {
+      error = "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
+      displayState = ERROR;
+
+    } else if (trackCount != numMainMenuItems) {
+      error = "Track and menu item\n   count mismatch";
+      displayState = ERROR;
+
+    } 
+    return trackCount;
+}
+void checkCard() {
+  bool cardInserted = digitalRead(CD_PIN) == LOW; 
+
+  if(cardInserted != lastCard){
+    if (!cardInserted) {
+      mp3.stopPlaying();
+      error = "No SD card inserted.";
+      displayState = ERROR;
+       
+    } else {
+      delay(250);
+      mp3.reset();
+
+      int retries = 0;
+
+      while(checkTrackCount() != numMainMenuItems){
+        if (retries >= 25){
+          mp3.reset();
+          retries = 0;
+        }
+        delay(10);
+        retries++;
+      }
+      
+
+      mp3.setVolume(30);
+      mainMenuPos = random(numMainMenuItems);  // select random track, so not all players start on the same one
+      lastMainMenuPos = mainMenuPos;
+
+      currentPage = getPage(mainMenuPos);
+      lastPage = getPage(lastMainMenuPos);
+
+      mp3.playTrackNumber(mainMenuPos + 1);
+
+      displayState = MAIN_MENU;
+    }
+    lastCard = cardInserted;
+  }
+}
 
 void checkInputs() {
   unsigned long currentTime = micros();
@@ -218,13 +268,20 @@ void checkInputs() {
     }
   }
 }
-void drawMainMenuBG()  {
+void drawMainMenuBG() {
   tft.fillScreen(BLACK);
   tft.setTextColor(WHITE);
   tft.setTextSize(3);
   tft.setCursor(20, 20);
   tft.println("TRACK LISTING");
   tft.drawFastHLine(20, 55, 280, RED);
+
+  tft.setCursor(20, 450);
+
+  tft.setTextSize(2);
+  tft.setTextColor(GREEN);
+  String nowPlaying = String(menuItems[mainMenuPos]);
+  tft.print("NOW PLAYING: " + nowPlaying);
 }
 
 void drawMainMenu() {
@@ -241,6 +298,8 @@ void drawMainMenu() {
 
     tft.setTextColor(WHITE);
     tft.setCursor(25, yPos);
+    tft.print(index+1);
+    tft.print(". ");
     tft.println(menuItems[index]);
   }
 }
@@ -248,7 +307,7 @@ void drawMainMenu() {
 void drawMainMenuUpdate() {
   tft.setTextSize(2);
   int yPos;
-  
+
   if (currentPage != lastPage) {
     int itemsOnLastPage = getItemsOnPage(lastPage);
 
@@ -256,19 +315,23 @@ void drawMainMenuUpdate() {
       yPos = 80 + (i * 35);
       tft.fillRect(15, yPos - 5, 290, 28, BLACK);
     }
-    
+
     drawMainMenu();
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
     tft.fillRect(15, yPos - 5, 290, 28, BLACK);
     tft.setCursor(25, yPos);
     tft.setTextColor(WHITE);
+    tft.print(lastMainMenuPos+1);
+    tft.print(". ");
     tft.println(menuItems[lastMainMenuPos]);
 
     yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
     tft.fillRect(15, yPos - 5, 290, 28, BLUE);
     tft.setTextColor(WHITE);
     tft.setCursor(25, yPos);
+    tft.print(mainMenuPos+1);
+    tft.print(". ");
     tft.println(menuItems[mainMenuPos]);
   }
 }
@@ -279,8 +342,9 @@ void drawSubMenu() {
   tft.setTextSize(3);
   tft.setCursor(20, 40);
   tft.print("Opened:\n  ");
+  tft.print(mainMenuPos+1);
+  tft.print(". ");
   tft.println(menuItems[mainMenuPos]);
-
   tft.setTextColor(WHITE);
   tft.setTextSize(2);
   tft.setCursor(20, 180);
