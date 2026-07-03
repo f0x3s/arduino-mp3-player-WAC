@@ -195,41 +195,40 @@ void loop() {
 int checkTrackCount() {
   int trackCount = mp3.getSongCount();  // Fetch Track Count
 
-    if (trackCount == 0) {
-      error = "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
-      displayState = ERROR;
+  if (trackCount == 0) {
+    error = "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
+    displayState = ERROR;
 
-    } else if (trackCount != numMainMenuItems) {
-      error = "Track and menu item\n   count mismatch";
-      displayState = ERROR;
-
-    } 
-    return trackCount;
+  } else if (trackCount != numMainMenuItems) {
+    error = "Track and menu item\n   count mismatch";
+    displayState = ERROR;
+  }
+  return trackCount;
 }
 void checkCard() {
-  bool cardInserted = digitalRead(CD_PIN) == LOW; 
+  bool cardInserted = digitalRead(CD_PIN) == LOW;
 
-  if(cardInserted != lastCard){
+  if (cardInserted != lastCard) {
     if (!cardInserted) {
       mp3.stopPlaying();
       error = "No SD card inserted.";
       displayState = ERROR;
-       
+
     } else {
       delay(250);
       mp3.reset();
 
       int retries = 0;
 
-      while(checkTrackCount() != numMainMenuItems){
-        if (retries >= 25){
+      while (checkTrackCount() != numMainMenuItems) {
+        if (retries >= 25) {
           mp3.reset();
           retries = 0;
         }
         delay(10);
         retries++;
       }
-      
+
 
       mp3.setVolume(30);
       mainMenuPos = random(numMainMenuItems);  // select random track, so not all players start on the same one
@@ -260,9 +259,11 @@ void checkInputs() {
     }
   }
 
-  if (currentPos != lastPos && currentPos % 4 == 0) {
+  long delta = currentPos - lastPos;
+
+  if (abs(delta) >= 4) {
     if (currentTime - lastEncoderTime > dbEncoderDelay) {
-      req.knob = (-1) * constrain(currentPos - lastPos, -1, 1);
+      req.knob = (-1) * constrain(delta, -1, 1);
       lastPos = currentPos;
       lastEncoderTime = currentTime;
     }
@@ -280,16 +281,14 @@ void drawMainMenuBG() {
   tft.setCursor(20, 440);
   tft.setTextColor(GRAY);
   tft.print("Page ");
-  tft.print((currentPage/10)+1);
+  tft.print((currentPage / 10) + 1);
   tft.print(" of ");
-  tft.print((getPage(numMainMenuItems)/10)+1);
+  tft.print((getPage(numMainMenuItems) / 10) + 1);
 
   tft.setCursor(20, 460);
   tft.setTextColor(GREEN);
   String nowPlaying = String(menuItems[mainMenuPos]);
   tft.println("NOW PLAYING: " + nowPlaying);
-  
-
 }
 
 void drawMainMenu() {
@@ -306,7 +305,7 @@ void drawMainMenu() {
 
     tft.setTextColor(WHITE);
     tft.setCursor(25, yPos);
-    tft.print(index+1);
+    tft.print(index + 1);
     tft.print(". ");
     tft.println(menuItems[index]);
   }
@@ -320,24 +319,47 @@ void drawMainMenuUpdate() {
     int itemsOnLastPage = getItemsOnPage(lastPage);
 
     for (int i = 0; i < itemsOnLastPage; i++) {
+      int index = lastPage + i;
       yPos = 80 + (i * 35);
-      tft.fillRect(15, yPos - 5, 290, 28, BLACK);
+      if(index == lastMainMenuPos) {
+        tft.fillRect(15, yPos - 5, 290, 28, BLACK);
+      } else {
+        tft.setCursor(25, yPos);
+        tft.setTextColor(BLACK);
+        tft.print(index + 1);
+        tft.print(". ");
+        tft.println(menuItems[index]);
+      }
+
+
     }
-    // TODO - FIX with Smarter Bounding
-    tft.fillRect(20, 440, 140, 12, BLACK);
+
+    String erase = "Page " + String((lastPage / 10) + 1);
+    int16_t x1, y1;
+    uint16_t w, h;
+    tft.getTextBounds("Page ", 0, 0, &x1, &y1, &w, &h);
+
+    tft.setCursor(20+w, 440);
+    tft.setTextColor(BLACK);
+    tft.print((lastPage / 10) + 1);
+    //tft.fillRect(20, 440, 140, 12, BLACK);
     tft.setCursor(20, 440);
+
+
+    
     tft.setTextColor(GRAY);
     tft.print("Page ");
-    tft.print((currentPage/10)+1);
+    tft.print((currentPage / 10) + 1);
     tft.print(" of ");
-    tft.print((getPage(numMainMenuItems)/10)+1);
+    tft.print((getPage(numMainMenuItems) / 10) + 1);
     drawMainMenu();
+
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
     tft.fillRect(15, yPos - 5, 290, 28, BLACK);
     tft.setCursor(25, yPos);
     tft.setTextColor(WHITE);
-    tft.print(lastMainMenuPos+1);
+    tft.print(lastMainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[lastMainMenuPos]);
 
@@ -345,7 +367,7 @@ void drawMainMenuUpdate() {
     tft.fillRect(15, yPos - 5, 290, 28, BLUE);
     tft.setTextColor(WHITE);
     tft.setCursor(25, yPos);
-    tft.print(mainMenuPos+1);
+    tft.print(mainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[mainMenuPos]);
   }
@@ -357,7 +379,7 @@ void drawSubMenu() {
   tft.setTextSize(3);
   tft.setCursor(20, 40);
   tft.print("Opened:\n  ");
-  tft.print(mainMenuPos+1);
+  tft.print(mainMenuPos + 1);
   tft.print(". ");
   tft.println(menuItems[mainMenuPos]);
   tft.setTextColor(WHITE);
