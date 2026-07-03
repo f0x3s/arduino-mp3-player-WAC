@@ -276,12 +276,20 @@ void drawMainMenuBG() {
   tft.println("TRACK LISTING");
   tft.drawFastHLine(20, 55, 280, RED);
 
-  tft.setCursor(20, 450);
-
   tft.setTextSize(2);
+  tft.setCursor(20, 440);
+  tft.setTextColor(GRAY);
+  tft.print("Page ");
+  tft.print((currentPage/10)+1);
+  tft.print(" of ");
+  tft.print((getPage(numMainMenuItems)/10)+1);
+
+  tft.setCursor(20, 460);
   tft.setTextColor(GREEN);
   String nowPlaying = String(menuItems[mainMenuPos]);
-  tft.print("NOW PLAYING: " + nowPlaying);
+  tft.println("NOW PLAYING: " + nowPlaying);
+  
+
 }
 
 void drawMainMenu() {
@@ -315,7 +323,14 @@ void drawMainMenuUpdate() {
       yPos = 80 + (i * 35);
       tft.fillRect(15, yPos - 5, 290, 28, BLACK);
     }
-
+    // TODO - FIX with Smarter Bounding
+    tft.fillRect(20, 440, 140, 12, BLACK);
+    tft.setCursor(20, 440);
+    tft.setTextColor(GRAY);
+    tft.print("Page ");
+    tft.print((currentPage/10)+1);
+    tft.print(" of ");
+    tft.print((getPage(numMainMenuItems)/10)+1);
     drawMainMenu();
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
