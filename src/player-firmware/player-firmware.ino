@@ -11,6 +11,7 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
+#include "styleSheet.h"
 
 // Color Definitions
 #define BLACK 0x0000
