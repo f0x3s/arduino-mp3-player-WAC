@@ -2,7 +2,7 @@ void drawWrappedText(String text, int startX, int startY, int marginX2, int text
   tft.setTextSize(textSize);
   tft.setTextColor(textColor);
 
- // Variables to pass to getTextBounds
+  // Variables to pass to getTextBounds
   int16_t x1, y1;
   uint16_t sampleWidth, sampleHeight;
   
@@ -44,4 +44,12 @@ void drawWrappedText(String text, int startX, int startY, int marginX2, int text
 
     word = strtok(NULL, " "); // Get next word
   }
+}
+
+int getPage(int x, int tracksPerPage, int numMenuItems) {
+  int maxPageStart = ((numMenuItems - 1) / tracksPerPage) * tracksPerPage;
+  return constrain((x / tracksPerPage) * tracksPerPage, 0, maxPageStart);
+}
+int getItemsOnPage(int page, int tracksPerPage, int numMenuItems) {
+  return min(tracksPerPage, numMenuItems - page);
 }

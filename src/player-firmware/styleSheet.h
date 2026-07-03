@@ -20,6 +20,8 @@
 #define MM_HL_C BLUE  // Main Menu Highlight
 #define MM_PC_C GRAY  // Main Menu Page Count
 #define MM_NP_C GREEN // Main Menu Now Playing
+// Spacing
+const int MM_MARGIN = 20;
 
 
 // Sub Menu
@@ -29,7 +31,8 @@
 #define SM_H_TXT_C GREEN  // Sub Menu Header Text
 #define SM_DES_TXT_C GREEN  // Sub Menu Description Text
 #define SM_RET_TXT_C GRAY  // Sub Menu Return Text
-
+// Spacing
+const int SM_MARGIN = 20;
 
 // Error
 
@@ -38,3 +41,5 @@
 #define ER_H_TXT_C BLACK  // Error Screen Header Text
 #define ER_SH_TXT_C BLACK  // Error Screen Sub Header Text
 #define ER_LG_TXT_C BLACK  // Error Screen Log Text
+// Spacing
+const int ER_MARGIN = 20;

@@ -12,11 +12,10 @@
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
 
-
-
-// Initialize TFT
+// Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
 #include "gfxHelpers.h"
+
 // Encoder & Button Setup
 const int CLK_PIN = 18;
 const int DT_PIN = 19;
@@ -74,8 +73,8 @@ void setup() {
   mainMenuPos = random(numMainMenuItems);  // select random track, so not all players start on the same one
   lastMainMenuPos = mainMenuPos;
 
-  currentPage = getPage(mainMenuPos);
-  lastPage = getPage(lastMainMenuPos);
+  currentPage = getPage(mainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
+  lastPage = getPage(lastMainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
 
   tft.reset();
   uint16_t ID = tft.readID();
@@ -122,8 +121,8 @@ void loop() {
         if (lastDisplayState != displayState)  // moving to main menu from other screen
         {
           // draw everything
-          currentPage = getPage(lastMainMenuPos);
-          lastPage = getPage(mainMenuPos);
+          currentPage = getPage(lastMainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
+          lastPage = getPage(mainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
           drawMainMenuBG();
           drawMainMenu();
           lastDisplayState = displayState;
@@ -132,8 +131,8 @@ void loop() {
         else if (mainMenuPos != lastMainMenuPos)  // change in highlghted menu item
         {
           // update selection
-          currentPage = getPage(mainMenuPos);
-          lastPage = getPage(lastMainMenuPos);
+          currentPage = getPage(mainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
+          lastPage = getPage(lastMainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
 
 
           drawMainMenuUpdate();
@@ -190,7 +189,7 @@ int checkTrackCount() {
   int trackCount = mp3.getSongCount();  // Fetch Track Count
 
   if (trackCount == 0) {
-    error = "No tracks found.\n   Make sure the SD card\n   is inserted and there\n   are MP3s on it.";
+    error = "No tracks found. Make sure the SD card is inserted and there are MP3s on it.";
     displayState = ERROR;
 
   } else if (trackCount != numMainMenuItems) {
@@ -209,7 +208,7 @@ void checkCard() {
       displayState = ERROR;
 
     } else {
-      delay(250);
+      delay(500);
       mp3.reset();
 
       int retries = 0;
@@ -228,8 +227,8 @@ void checkCard() {
       mainMenuPos = random(numMainMenuItems);  // select random track, so not all players start on the same one
       lastMainMenuPos = mainMenuPos;
 
-      currentPage = getPage(mainMenuPos);
-      lastPage = getPage(lastMainMenuPos);
+      currentPage = getPage(mainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
+      lastPage = getPage(lastMainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
 
       mp3.playTrackNumber(mainMenuPos + 1);
 
@@ -269,19 +268,19 @@ void drawMainMenuBG() {
   tft.fillScreen(MM_BG_C);
   tft.setTextColor(MM_H_TXT_C);
   tft.setTextSize(3);
-  tft.setCursor(20, 20);
+  tft.setCursor(MM_MARGIN, 20);
   tft.println("TRACK LISTING");
-  tft.drawFastHLine(20, 55, 280, MM_H_HR_C);
+  tft.drawFastHLine(MM_MARGIN-5, 55, tft.width() - 2* (MM_MARGIN-5), MM_H_HR_C);
 
   tft.setTextSize(2);
-  tft.setCursor(20, 440);
+  tft.setCursor(MM_MARGIN, 440);
   tft.setTextColor(MM_PC_C);
   tft.print("Page ");
   tft.print((currentPage / 10) + 1);
   tft.print(" of ");
-  tft.print((getPage(numMainMenuItems) / 10) + 1);
+  tft.print((getPage(numMainMenuItems, TRACKS_PER_PAGE, numMainMenuItems) / 10) + 1);
 
-  tft.setCursor(20, 460);
+  tft.setCursor(MM_MARGIN, 460);
   tft.setTextColor(MM_NP_C);
   String nowPlaying = String(menuItems[mainMenuPos]);
   tft.println("NOW PLAYING: " + nowPlaying);
@@ -296,11 +295,11 @@ void drawMainMenu() {
     if (index >= numMainMenuItems) break;
 
     if (index == mainMenuPos) {
-      tft.fillRect(15, yPos - 5, 290, 28, MM_HL_C);
+      tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_HL_C);
     }
 
     tft.setTextColor(MM_TXT_C);
-    tft.setCursor(25, yPos);
+    tft.setCursor(MM_MARGIN+5, yPos);
     tft.print(index + 1);
     tft.print(". ");
     tft.println(menuItems[index]);
@@ -312,15 +311,15 @@ void drawMainMenuUpdate() {
   int yPos;
 
   if (currentPage != lastPage) {
-    int itemsOnLastPage = getItemsOnPage(lastPage);
+    int itemsOnLastPage = getItemsOnPage(lastPage, TRACKS_PER_PAGE, numMainMenuItems);
 
     for (int i = 0; i < itemsOnLastPage; i++) {
       int index = lastPage + i;
       yPos = 80 + (i * 35);
       if(index == lastMainMenuPos) {
-        tft.fillRect(15, yPos - 5, 290, 28, MM_BG_C);
+        tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2* (MM_MARGIN-5), 28, MM_BG_C);
       } else {
-        tft.setCursor(25, yPos);
+        tft.setCursor(MM_MARGIN+5, yPos);
         tft.setTextColor(MM_BG_C);
         tft.print(index + 1);
         tft.print(". ");
@@ -335,31 +334,31 @@ void drawMainMenuUpdate() {
     uint16_t w, h;
     tft.getTextBounds("Page ", 0, 0, &x1, &y1, &w, &h);
 
-    tft.setCursor(20+w, 440);
+    tft.setCursor(MM_MARGIN+w, 440);
     tft.setTextColor(MM_BG_C);
     tft.print((lastPage / 10) + 1);
  
-    tft.setCursor(20, 440);
+    tft.setCursor(MM_MARGIN, 440);
     tft.setTextColor(MM_PC_C);
     tft.print("Page ");
     tft.print((currentPage / 10) + 1);
     tft.print(" of ");
-    tft.print((getPage(numMainMenuItems) / 10) + 1);
+    tft.print((getPage(numMainMenuItems, TRACKS_PER_PAGE, numMainMenuItems) / 10) + 1);
     drawMainMenu();
 
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(15, yPos - 5, 290, 28, MM_BG_C);
-    tft.setCursor(25, yPos);
+    tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_BG_C);
+    tft.setCursor(MM_MARGIN + 5, yPos);
     tft.setTextColor(MM_TXT_C);
     tft.print(lastMainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[lastMainMenuPos]);
 
     yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(15, yPos - 5, 290, 28, MM_HL_C);
+    tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_HL_C);
     tft.setTextColor(MM_TXT_C);
-    tft.setCursor(25, yPos);
+    tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(mainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[mainMenuPos]);
@@ -370,14 +369,14 @@ void drawSubMenu() {
   tft.fillScreen(SM_BG_C);
   tft.setTextColor(SM_H_TXT_C);
   tft.setTextSize(3);
-  tft.setCursor(20, 40);
+  tft.setCursor(SM_MARGIN, 40);
   tft.print("Opened:\n  ");
   tft.print(mainMenuPos + 1);
   tft.print(". ");
   tft.println(menuItems[mainMenuPos]);
   tft.setTextColor(SM_RET_TXT_C);
   tft.setTextSize(2);
-  tft.setCursor(20, 180);
+  tft.setCursor(SM_MARGIN, 180);
   tft.println("Press Knob to Return");
 }
 
@@ -385,31 +384,21 @@ void drawError() {
   tft.fillScreen(ER_BG_C);
   tft.setTextColor(ER_H_TXT_C);
   tft.setTextSize(4);
-  tft.setCursor(20, 40);
+  tft.setCursor(ER_MARGIN, 40);
   tft.print("ERROR");
   tft.setTextColor(ER_SH_TXT_C);
   tft.setTextSize(2);
-  tft.setCursor(20, 80);
+  tft.setCursor(ER_MARGIN, 80);
   tft.print("We've run into an issue");
-
-  drawWrappedText("Please Alert Nearby Gallery Attendant", 20, 120, 20, ER_SH_TXT_C, 2);
-
+  drawWrappedText("Please Alert Nearby Gallery Attendant", ER_MARGIN, 120, ER_MARGIN, ER_SH_TXT_C, 2);
 
   int16_t x1, y1;
   uint16_t w, h;
   tft.setTextColor(ER_LG_TXT_C);
   tft.getTextBounds(error, 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(20, 440 - h);
+  tft.setCursor(ER_MARGIN, 440-h);
   tft.print("Log: ");
-  tft.setCursor(20, 460 - h);
-  tft.print(error);
+  drawWrappedText(error, ER_MARGIN, 460 - h, ER_MARGIN, ER_SH_TXT_C, 2);
 }
 
-int getItemsOnPage(int page) {
-  return min(TRACKS_PER_PAGE, numMainMenuItems - page);
-}
 
-int getPage(int x) {
-  int maxPageStart = ((numMainMenuItems - 1) / TRACKS_PER_PAGE) * TRACKS_PER_PAGE;
-  return constrain((x / TRACKS_PER_PAGE) * TRACKS_PER_PAGE, 0, maxPageStart);
-}
