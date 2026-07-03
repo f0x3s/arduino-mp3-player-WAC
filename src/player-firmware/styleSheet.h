@@ -28,7 +28,7 @@
 #define SM_BG_C BLACK // Sub Menu Background
 #define SM_H_TXT_C GREEN  // Sub Menu Header Text
 #define SM_DES_TXT_C GREEN  // Sub Menu Description Text
-#define SM_RET_TXT_C GREEN  // Sub Menu Return Text
+#define SM_RET_TXT_C GRAY  // Sub Menu Return Text
 
 
 // Error

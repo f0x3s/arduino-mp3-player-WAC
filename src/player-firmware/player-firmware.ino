@@ -11,11 +11,12 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
-#include "styleSheet.h"
+
+
 
 // Initialize TFT
 MCUFRIEND_kbv tft;
-
+#include "gfxHelpers.h"
 // Encoder & Button Setup
 const int CLK_PIN = 18;
 const int DT_PIN = 19;
@@ -65,7 +66,7 @@ SparkFunMY1690 mp3;
 const int CD_PIN = 23;
 
 bool lastCard = true;
-
+#include "styleSheet.h"
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
   randomSeed(analogRead(A0));
@@ -367,14 +368,14 @@ void drawMainMenuUpdate() {
 
 void drawSubMenu() {
   tft.fillScreen(SM_BG_C);
-  tft.setTextColor(SM_H_C);
+  tft.setTextColor(SM_H_TXT_C);
   tft.setTextSize(3);
   tft.setCursor(20, 40);
   tft.print("Opened:\n  ");
   tft.print(mainMenuPos + 1);
   tft.print(". ");
   tft.println(menuItems[mainMenuPos]);
-  tft.setTextColor(SM_RET_C);
+  tft.setTextColor(SM_RET_TXT_C);
   tft.setTextSize(2);
   tft.setCursor(20, 180);
   tft.println("Press Knob to Return");
@@ -390,10 +391,9 @@ void drawError() {
   tft.setTextSize(2);
   tft.setCursor(20, 80);
   tft.print("We've run into an issue");
-  tft.setCursor(20, 120);
-  tft.print("Please Alert Nearby");
-  tft.setCursor(20, 140);
-  tft.print("Gallery Attendant");
+
+  drawWrappedText("Please Alert Nearby Gallery Attendant", 20, 120, 20, ER_SH_TXT_C, 2);
+
 
   int16_t x1, y1;
   uint16_t w, h;
