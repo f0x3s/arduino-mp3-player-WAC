@@ -35,10 +35,17 @@ const int MM_TXT_SZ = 2;
 // Colors
 #define SM_BG_C BLACK // Sub Menu Background
 #define SM_H_TXT_C GREEN  // Sub Menu Header Text
+#define SM_SH_TXT_C GREEN  // Sub Menu Sub Header Text
 #define SM_DES_TXT_C GREEN  // Sub Menu Description Text
 #define SM_RET_TXT_C GRAY  // Sub Menu Return Text
 // Spacing
 const int SM_MARGIN = 20;
+const float SM_LS = SINGLE;  // Main Menu Line Spacing
+/// Sizing 
+const int SM_H_TXT_SZ = 3;
+const int SM_SH_TXT_SZ = 3;
+const int SM_TXT_SZ = 2;
+const int SM_RET_TXT_SZ = 2;
 
 // Error
 // Colors

@@ -370,18 +370,40 @@ void drawMainMenuUpdate() {
 }
 
 void drawSubMenu() {
+  int16_t x1, y1;
+  uint16_t w, h;
+  yAndLH cP;
   tft.fillScreen(SM_BG_C);
+
+
   tft.setTextColor(SM_H_TXT_C);
   tft.setTextSize(3);
   tft.setCursor(SM_MARGIN, 40);
-  tft.print("Opened:\n  ");
-  tft.print(mainMenuPos + 1);
-  tft.print(". ");
-  tft.println(menuItems[mainMenuPos]);
-  tft.setTextColor(SM_RET_TXT_C);
-  tft.setTextSize(2);
-  tft.setCursor(SM_MARGIN, 180);
-  tft.println("Press Knob to Return");
+
+  cP = drawWrappedText("Opened:", 
+  SM_MARGIN, 2 * SM_MARGIN, 
+  SM_MARGIN, 
+  SM_H_TXT_C, 
+  SM_H_TXT_SZ);
+
+  String itemName = String(mainMenuPos + 1) + ". " + String(menuItems[mainMenuPos]);
+  cP = drawWrappedText(itemName, 
+  SM_MARGIN, 
+  cP.y+(SM_LS*cP.lh), 
+  SM_MARGIN, 
+  SM_SH_TXT_C, 
+  SM_SH_TXT_SZ); 
+
+  String retMessage = "Press Knob to Return";
+  tft.setTextSize(SM_RET_TXT_SZ);
+  tft.getTextBounds(retMessage, 0, 0, &x1, &y1, &w, &h);
+
+  cP = drawWrappedText(retMessage, 
+  SM_MARGIN, 
+  (tft.height() - SM_MARGIN) - h, 
+  SM_MARGIN, 
+  SM_RET_TXT_C, 
+  SM_RET_TXT_SZ);
 }
 
 void drawError() {
@@ -391,22 +413,42 @@ void drawError() {
 
   tft.fillScreen(ER_BG_C);
   cP = drawWrappedText("ERROR", 
-  ER_MARGIN, 2 * ER_MARGIN, ER_MARGIN, ER_H_TXT_C, ER_H_TXT_SZ);
+  ER_MARGIN, 
+  2 * ER_MARGIN, 
+  ER_MARGIN, 
+  ER_H_TXT_C, 
+  ER_H_TXT_SZ);
 
   cP = drawWrappedText("We've run into an issue", 
-  ER_MARGIN, cP.y+(ER_LS*cP.lh), ER_MARGIN, ER_SH_TXT_C, ER_SH_TXT_SZ); 
+  ER_MARGIN, 
+  cP.y+(ER_LS*cP.lh), 
+  ER_MARGIN, 
+  ER_SH_TXT_C, 
+  ER_SH_TXT_SZ); 
 
   cP = drawWrappedText("Please Alert Nearby Gallery Attendant", 
-  ER_MARGIN, cP.y+(ER_LS * 2 * cP.lh), ER_MARGIN, ER_SH_TXT_C, ER_SH_TXT_SZ);
+  ER_MARGIN, 
+  cP.y+(ER_LS * 2 * cP.lh), 
+  ER_MARGIN, 
+  ER_SH_TXT_C, 
+  ER_SH_TXT_SZ);
 
   tft.setTextSize(ER_LG_TXT_SZ);
   tft.getTextBounds(error, 0, 0, &x1, &y1, &w, &h);
 
   cP = drawWrappedText("Log: ", 
-  ER_MARGIN, (tft.height() - (2 * ER_MARGIN)) - h, ER_MARGIN, ER_LG_TXT_C, ER_LG_TXT_SZ);
+  ER_MARGIN,
+  (tft.height() - (2 * ER_MARGIN)) - h, 
+  ER_MARGIN, 
+  ER_LG_TXT_C, 
+  ER_LG_TXT_SZ);
 
   cP = drawWrappedText(error, 
-  ER_MARGIN, (tft.height() - ER_MARGIN) - h, ER_MARGIN, ER_LG_TXT_C, ER_LG_TXT_SZ);
+  ER_MARGIN, 
+  (tft.height() - ER_MARGIN) - h, 
+  ER_MARGIN, 
+  ER_LG_TXT_C, 
+  ER_LG_TXT_SZ);
 }
 
 
