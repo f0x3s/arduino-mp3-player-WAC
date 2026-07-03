@@ -1,4 +1,11 @@
-void drawWrappedText(String text, int startX, int startY, int marginX2, int textColor, int textSize) {
+struct yAndLH {
+  int y;
+  int lh;
+};
+
+
+yAndLH drawWrappedText(String text, int startX, int startY, int marginX2, int textColor, int textSize) {
+  yAndLH ret;
   tft.setTextSize(textSize);
   tft.setTextColor(textColor);
 
@@ -8,7 +15,7 @@ void drawWrappedText(String text, int startX, int startY, int marginX2, int text
   
   // Automatically calculate the line height using a benchmark letter
   tft.getTextBounds("M", 0, 0, &x1, &y1, &sampleWidth, &sampleHeight);
-
+  ret.lh = sampleHeight;
   int maxWidth = tft.width() - marginX2; // Total width minus right margin
   int cursorX = startX;
   int cursorY = startY;
@@ -44,6 +51,8 @@ void drawWrappedText(String text, int startX, int startY, int marginX2, int text
 
     word = strtok(NULL, " "); // Get next word
   }
+  ret.y = cursorY;
+  return ret;
 }
 
 int getPage(int x, int tracksPerPage, int numMenuItems) {

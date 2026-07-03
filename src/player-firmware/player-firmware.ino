@@ -265,11 +265,15 @@ void checkInputs() {
 
 
 void drawMainMenuBG() {
+  yAndLH cP;
+
   tft.fillScreen(MM_BG_C);
+
   tft.setTextColor(MM_H_TXT_C);
   tft.setTextSize(3);
   tft.setCursor(MM_MARGIN, 20);
   tft.println("TRACK LISTING");
+
   tft.drawFastHLine(MM_MARGIN-5, 55, tft.width() - 2* (MM_MARGIN-5), MM_H_HR_C);
 
   tft.setTextSize(2);
@@ -381,24 +385,28 @@ void drawSubMenu() {
 }
 
 void drawError() {
-  tft.fillScreen(ER_BG_C);
-  tft.setTextColor(ER_H_TXT_C);
-  tft.setTextSize(4);
-  tft.setCursor(ER_MARGIN, 40);
-  tft.print("ERROR");
-  tft.setTextColor(ER_SH_TXT_C);
-  tft.setTextSize(2);
-  tft.setCursor(ER_MARGIN, 80);
-  tft.print("We've run into an issue");
-  drawWrappedText("Please Alert Nearby Gallery Attendant", ER_MARGIN, 120, ER_MARGIN, ER_SH_TXT_C, 2);
-
   int16_t x1, y1;
   uint16_t w, h;
-  tft.setTextColor(ER_LG_TXT_C);
+  yAndLH cP;
+
+  tft.fillScreen(ER_BG_C);
+  cP = drawWrappedText("ERROR", 
+  ER_MARGIN, 2 * ER_MARGIN, ER_MARGIN, ER_H_TXT_C, ER_H_TXT_SZ);
+
+  cP = drawWrappedText("We've run into an issue", 
+  ER_MARGIN, cP.y+(ER_LS*cP.lh), ER_MARGIN, ER_SH_TXT_C, ER_SH_TXT_SZ); 
+
+  cP = drawWrappedText("Please Alert Nearby Gallery Attendant", 
+  ER_MARGIN, cP.y+(ER_LS * 2 * cP.lh), ER_MARGIN, ER_SH_TXT_C, ER_SH_TXT_SZ);
+
+  tft.setTextSize(ER_LG_TXT_SZ);
   tft.getTextBounds(error, 0, 0, &x1, &y1, &w, &h);
-  tft.setCursor(ER_MARGIN, 440-h);
-  tft.print("Log: ");
-  drawWrappedText(error, ER_MARGIN, 460 - h, ER_MARGIN, ER_SH_TXT_C, 2);
+
+  cP = drawWrappedText("Log: ", 
+  ER_MARGIN, (tft.height() - (2 * ER_MARGIN)) - h, ER_MARGIN, ER_LG_TXT_C, ER_LG_TXT_SZ);
+
+  cP = drawWrappedText(error, 
+  ER_MARGIN, (tft.height() - ER_MARGIN) - h, ER_MARGIN, ER_LG_TXT_C, ER_LG_TXT_SZ);
 }
 
 
