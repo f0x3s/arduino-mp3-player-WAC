@@ -10,7 +10,7 @@
 #include <Adafruit_GFX.h>
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
-#include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
+#include "testDisplayInfo.h"  // #include "displayInfo.h"
 #include "styleSheet.h"
 // Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
@@ -36,7 +36,7 @@ const unsigned long dbButtonDelay = 20000;  // Button Debounce (microseconds)
 long lastPos = 0;
 bool lastButton = false;
 
-// Tracklist located in trackDisplayNames.h
+// Tracklist located in displayInfo.h
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
 int maxDescChars = 0;
 const int TRACKS_PER_PAGE = 10;
@@ -483,6 +483,7 @@ void drawSubMenuUpdate() {
   
   maxPage = cP.pages;
 }
+
 void drawError() {
   int16_t x1, y1;
   uint16_t w, h;

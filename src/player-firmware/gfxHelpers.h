@@ -255,7 +255,7 @@ cursorTrack drawPagedWrappedText(String text, int startX, int startY, int margin
     int endWidth = 6 * (6 * textSize); // width of " (EOF)"
 
     if (printedAnyWord && cursorX + endWidth <= maxWidth) {
-      tft.print(" <EOF>");
+      tft.print(" <eof>");
     } else {
       int endY;
 
@@ -267,7 +267,7 @@ cursorTrack drawPagedWrappedText(String text, int startX, int startY, int margin
       int16_t x2, y2;
       uint16_t w, h;
       tft.setCursor(startX, endY);
-      tft.print("<EOF>");
+      tft.print("<eof>");
 
       ret.y = endY;
     }

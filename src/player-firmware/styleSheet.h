@@ -61,9 +61,9 @@ const int SM_RET_TXT_SZ = 2;
 
 // Error
 // Colors
-#define ER_BG_C RED // Error Screen Background
-#define ER_H_TXT_C BLACK  // Error Screen Header Text
-#define ER_SH_TXT_C BLACK  // Error Screen Sub Header Text
+#define ER_BG_C WHITE // Error Screen Background
+#define ER_H_TXT_C RED  // Error Screen Header Text
+#define ER_SH_TXT_C RED  // Error Screen Sub Header Text
 #define ER_LG_TXT_C BLACK  // Error Screen Log Text
 // Spacing
 const int ER_MARGIN = 20;  // Error Screen Margins
