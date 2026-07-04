@@ -1,3 +1,11 @@
+/* 
+  audio player style sheet
+
+  created 3 July 2026
+  modified 4 July 2026
+  by foxes
+*/
+
 // Color Definitions
 #define BLACK 0x0000
 #define WHITE 0xFFFF
@@ -35,16 +43,20 @@ const int MM_TXT_SZ = 2;
 // Colors
 #define SM_BG_C BLACK // Sub Menu Background
 #define SM_H_TXT_C GREEN  // Sub Menu Header Text
-#define SM_SH_TXT_C GREEN  // Sub Menu Sub Header Text
-#define SM_DES_TXT_C GREEN  // Sub Menu Description Text
+#define SM_SH_TXT_C BLUE  // Sub Menu Sub Header Text
+#define SM_DES_TXT_C WHITE  // Sub Menu Description Text
 #define SM_RET_TXT_C GRAY  // Sub Menu Return Text
+#define SM_ELL_TXT_C BLUE  // Sub Menu Ellispses Text
+#define SM_END_TXT_C RED  // Sub Menu EOF Text 
+
 // Spacing
 const int SM_MARGIN = 20;
-const float SM_LS = SINGLE;  // Main Menu Line Spacing
+const float SM_LS = SINGLE;  // Sub Menu Line Spacing
+const int MAX_SM_LN;  // Maximum Lines of Text to display on Sub Menu
 /// Sizing 
-const int SM_H_TXT_SZ = 3;
+const int SM_H_TXT_SZ = 6;
 const int SM_SH_TXT_SZ = 3;
-const int SM_TXT_SZ = 2;
+const int SM_DES_TXT_SZ = 2;
 const int SM_RET_TXT_SZ = 2;
 
 // Error

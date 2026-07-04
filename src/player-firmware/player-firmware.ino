@@ -2,7 +2,7 @@
   audio player firmware 
 
   created 2 July 2026
-  modified 2 July 2026
+  modified 4 July 2026
   by foxes
 */
 
@@ -11,10 +11,14 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testTrackDisplayNames.h"  // #include "trackDisplayNames.h"
-
+#include "styleSheet.h"
 // Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
-#include "gfxHelpers.h"
+struct cursorTrack {
+  int y;
+  int lh;
+  int pages;
+};
 
 // Encoder & Button Setup
 const int CLK_PIN = 18;
@@ -34,6 +38,7 @@ bool lastButton = false;
 
 // Tracklist located in trackDisplayNames.h
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
+int maxDescChars = 0;
 const int TRACKS_PER_PAGE = 10;
 int currentPage;
 int lastPage;
@@ -43,11 +48,17 @@ int randomMainMenuStart;
 int mainMenuPos;
 int lastMainMenuPos;
 
+int lastLinePos;
+int currentLinePos;
+int maxPage=100;
+
 struct Request {
   bool button;
   int knob;
 };
 Request req = { false, 0 };
+
+#include "gfxHelpers.h"
 
 enum State {
   ERROR,
@@ -65,7 +76,7 @@ SparkFunMY1690 mp3;
 const int CD_PIN = 23;
 
 bool lastCard = true;
-#include "styleSheet.h"
+
 void setup() {
   pinMode(BT_PIN, INPUT_PULLUP);
   randomSeed(analogRead(A0));
@@ -96,9 +107,14 @@ void setup() {
   }
 
 
+
+  for(int i = 0; i < numMainMenuItems; i++) {
+    if (strlen(desc[i]) > maxDescChars) maxDescChars = strlen(desc[i]);
+  }
+
+
   if (displayState != ERROR) displayState = MAIN_MENU;
   mp3.playTrackNumber(mainMenuPos + 1);
-  //displayState = MAIN_MENU;
 }
 
 void loop() {
@@ -121,6 +137,8 @@ void loop() {
         if (lastDisplayState != displayState)  // moving to main menu from other screen
         {
           // draw everything
+          currentLinePos = 0;
+          lastLinePos = 0;
           currentPage = getPage(lastMainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
           lastPage = getPage(mainMenuPos, TRACKS_PER_PAGE, numMainMenuItems);
           drawMainMenuBG();
@@ -152,9 +170,18 @@ void loop() {
         // (i.e. knob rotated by act of pressing button)
         displayState = MAIN_MENU;
       } else {
+
+        if (maxPage <= 1) {
+          currentLinePos = 0;
+          lastLinePos = 0;
+        } else {
+          currentLinePos += req.knob;
+          currentLinePos = constrain(currentLinePos, 0, maxPage - 1);
+        }
         if (lastDisplayState != displayState)  // moving to sub menu
         {
           // draw everything
+          
           drawSubMenu();
 
           // send play command if new track
@@ -164,6 +191,10 @@ void loop() {
           }
 
           lastDisplayState = displayState;
+        } else if (currentLinePos != lastLinePos) {
+          drawSubMenuUpdate();
+
+          lastLinePos = currentLinePos;
         }
       }
       break;
@@ -263,9 +294,8 @@ void checkInputs() {
   }
 }
 
-
 void drawMainMenuBG() {
-  yAndLH cP;
+  cursorTrack cP;
 
   tft.fillScreen(MM_BG_C);
 
@@ -274,7 +304,7 @@ void drawMainMenuBG() {
   tft.setCursor(MM_MARGIN, 20);
   tft.println("TRACK LISTING");
 
-  tft.drawFastHLine(MM_MARGIN-5, 55, tft.width() - 2* (MM_MARGIN-5), MM_H_HR_C);
+  tft.drawFastHLine(MM_MARGIN - 5, 55, tft.width() - 2 * (MM_MARGIN - 5), MM_H_HR_C);
 
   tft.setTextSize(2);
   tft.setCursor(MM_MARGIN, 440);
@@ -299,11 +329,11 @@ void drawMainMenu() {
     if (index >= numMainMenuItems) break;
 
     if (index == mainMenuPos) {
-      tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_HL_C);
+      tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
     }
 
     tft.setTextColor(MM_TXT_C);
-    tft.setCursor(MM_MARGIN+5, yPos);
+    tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(index + 1);
     tft.print(". ");
     tft.println(menuItems[index]);
@@ -320,17 +350,15 @@ void drawMainMenuUpdate() {
     for (int i = 0; i < itemsOnLastPage; i++) {
       int index = lastPage + i;
       yPos = 80 + (i * 35);
-      if(index == lastMainMenuPos) {
-        tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2* (MM_MARGIN-5), 28, MM_BG_C);
+      if (index == lastMainMenuPos) {
+        tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_BG_C);
       } else {
-        tft.setCursor(MM_MARGIN+5, yPos);
+        tft.setCursor(MM_MARGIN + 5, yPos);
         tft.setTextColor(MM_BG_C);
         tft.print(index + 1);
         tft.print(". ");
         tft.println(menuItems[index]);
       }
-
-
     }
 
     String erase = "Page " + String((lastPage / 10) + 1);
@@ -338,10 +366,10 @@ void drawMainMenuUpdate() {
     uint16_t w, h;
     tft.getTextBounds("Page ", 0, 0, &x1, &y1, &w, &h);
 
-    tft.setCursor(MM_MARGIN+w, 440);
+    tft.setCursor(MM_MARGIN + w, 440);
     tft.setTextColor(MM_BG_C);
     tft.print((lastPage / 10) + 1);
- 
+
     tft.setCursor(MM_MARGIN, 440);
     tft.setTextColor(MM_PC_C);
     tft.print("Page ");
@@ -352,7 +380,7 @@ void drawMainMenuUpdate() {
 
   } else {
     yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_BG_C);
+    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_BG_C);
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.setTextColor(MM_TXT_C);
     tft.print(lastMainMenuPos + 1);
@@ -360,7 +388,7 @@ void drawMainMenuUpdate() {
     tft.println(menuItems[lastMainMenuPos]);
 
     yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(MM_MARGIN-5, yPos - 5, tft.width() - 2 * (MM_MARGIN-5), 28, MM_HL_C);
+    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
     tft.setTextColor(MM_TXT_C);
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(mainMenuPos + 1);
@@ -369,86 +397,133 @@ void drawMainMenuUpdate() {
   }
 }
 
+cursorTrack subCP;
+
 void drawSubMenu() {
   int16_t x1, y1;
   uint16_t w, h;
-  yAndLH cP;
+  cursorTrack cP;
   tft.fillScreen(SM_BG_C);
-
 
   tft.setTextColor(SM_H_TXT_C);
   tft.setTextSize(3);
   tft.setCursor(SM_MARGIN, 40);
 
-  cP = drawWrappedText("Opened:", 
-  SM_MARGIN, 2 * SM_MARGIN, 
-  SM_MARGIN, 
-  SM_H_TXT_C, 
-  SM_H_TXT_SZ);
+  cP = drawWrappedText("Now Playing",
+        SM_MARGIN, 2 * SM_MARGIN,
+        SM_MARGIN,
+        SM_H_TXT_C,
+        SM_H_TXT_SZ);
 
   String itemName = String(mainMenuPos + 1) + ". " + String(menuItems[mainMenuPos]);
-  cP = drawWrappedText(itemName, 
-  SM_MARGIN, 
-  cP.y+(SM_LS*cP.lh), 
-  SM_MARGIN, 
-  SM_SH_TXT_C, 
-  SM_SH_TXT_SZ); 
+  cP = drawWrappedText(itemName,
+        SM_MARGIN,
+        cP.y + (SM_LS * cP.lh),
+        SM_MARGIN,
+        SM_SH_TXT_C,
+        SM_SH_TXT_SZ);
 
+  subCP = cP;
+
+  cP = drawPagedWrappedText(desc[mainMenuPos],
+        SM_MARGIN,
+        cP.y + (SM_LS * 2 * cP.lh),
+        SM_MARGIN,
+        SM_DES_TXT_C,
+        SM_DES_TXT_SZ,
+        currentLinePos,
+        MAX_SM_LN);
+        
+  maxPage = cP.pages;
+
+  if (maxPage <= 1) {
+    currentLinePos = 0;
+    lastLinePos = 0;
+  }
+  
+  String scrollMessage = "Turn Knob to Scroll";
   String retMessage = "Press Knob to Return";
   tft.setTextSize(SM_RET_TXT_SZ);
   tft.getTextBounds(retMessage, 0, 0, &x1, &y1, &w, &h);
 
-  cP = drawWrappedText(retMessage, 
-  SM_MARGIN, 
-  (tft.height() - SM_MARGIN) - h, 
-  SM_MARGIN, 
-  SM_RET_TXT_C, 
-  SM_RET_TXT_SZ);
+  cP = drawWrappedText(scrollMessage,
+        SM_MARGIN,
+        (tft.height() - SM_MARGIN) - 2 * h,
+        SM_MARGIN,
+        SM_RET_TXT_C,
+        SM_RET_TXT_SZ);
+
+  cP = drawWrappedText(retMessage,
+        SM_MARGIN,
+        cP.y + (SM_LS * cP.lh),
+        SM_MARGIN,
+        SM_RET_TXT_C,
+        SM_RET_TXT_SZ);
 }
 
+void drawSubMenuUpdate() {
+  cursorTrack cP;
+  cP = drawPagedWrappedText(desc[mainMenuPos],
+        SM_MARGIN,
+        subCP.y + (SM_LS * 2 * subCP.lh),
+        SM_MARGIN,
+        SM_BG_C,
+        SM_DES_TXT_SZ,
+        lastLinePos,
+        MAX_SM_LN);
+
+  cP = drawPagedWrappedText(desc[mainMenuPos],
+        SM_MARGIN,
+        subCP.y + (SM_LS * 2 * subCP.lh),
+        SM_MARGIN,
+        SM_DES_TXT_C,
+        SM_DES_TXT_SZ,
+        currentLinePos,
+        MAX_SM_LN);
+  
+  maxPage = cP.pages;
+}
 void drawError() {
   int16_t x1, y1;
   uint16_t w, h;
-  yAndLH cP;
+  cursorTrack cP;
 
   tft.fillScreen(ER_BG_C);
-  cP = drawWrappedText("ERROR", 
-  ER_MARGIN, 
-  2 * ER_MARGIN, 
-  ER_MARGIN, 
-  ER_H_TXT_C, 
-  ER_H_TXT_SZ);
+  cP = drawWrappedText("ERROR",
+        ER_MARGIN,
+        2 * ER_MARGIN,
+        ER_MARGIN,
+        ER_H_TXT_C,
+        ER_H_TXT_SZ);
 
-  cP = drawWrappedText("We've run into an issue", 
-  ER_MARGIN, 
-  cP.y+(ER_LS*cP.lh), 
-  ER_MARGIN, 
-  ER_SH_TXT_C, 
-  ER_SH_TXT_SZ); 
+  cP = drawWrappedText("We've run into an issue",
+        ER_MARGIN,
+        cP.y + (ER_LS * cP.lh),
+        ER_MARGIN,
+        ER_SH_TXT_C,
+        ER_SH_TXT_SZ);
 
-  cP = drawWrappedText("Please Alert Nearby Gallery Attendant", 
-  ER_MARGIN, 
-  cP.y+(ER_LS * 2 * cP.lh), 
-  ER_MARGIN, 
-  ER_SH_TXT_C, 
-  ER_SH_TXT_SZ);
+  cP = drawWrappedText("Please Alert Nearby Gallery Attendant",
+        ER_MARGIN,
+        cP.y + (ER_LS * 2 * cP.lh),
+        ER_MARGIN,
+        ER_SH_TXT_C,
+        ER_SH_TXT_SZ);
 
   tft.setTextSize(ER_LG_TXT_SZ);
   tft.getTextBounds(error, 0, 0, &x1, &y1, &w, &h);
 
-  cP = drawWrappedText("Log: ", 
-  ER_MARGIN,
-  (tft.height() - (2 * ER_MARGIN)) - h, 
-  ER_MARGIN, 
-  ER_LG_TXT_C, 
-  ER_LG_TXT_SZ);
+  cP = drawWrappedText("Log: ",
+        ER_MARGIN,
+        (tft.height() - (2 * ER_MARGIN)) - h,
+        ER_MARGIN,
+        ER_LG_TXT_C,
+        ER_LG_TXT_SZ);
 
-  cP = drawWrappedText(error, 
-  ER_MARGIN, 
-  (tft.height() - ER_MARGIN) - h, 
-  ER_MARGIN, 
-  ER_LG_TXT_C, 
-  ER_LG_TXT_SZ);
+  cP = drawWrappedText(error,
+        ER_MARGIN,
+        (tft.height() - ER_MARGIN) - h,
+        ER_MARGIN,
+        ER_LG_TXT_C,
+        ER_LG_TXT_SZ);
 }
-
-
