@@ -47,7 +47,7 @@ const int MM_TXT_SZ = 2;
 #define SM_SH_TXT_C GRAY  // Sub Menu Sub Header Text
 #define SM_DES_TXT_C BLACK  // Sub Menu Description Text
 #define SM_RET_TXT_C GRAY  // Sub Menu Return Text
-#define SM_ELL_TXT_C BLUE  // Sub Menu Ellispses Text
+#define SM_ELL_TXT_C BLUE  // Sub Menu Ellipses Text
 #define SM_END_TXT_C RED  // Sub Menu EOF Text 
 
 // Spacing

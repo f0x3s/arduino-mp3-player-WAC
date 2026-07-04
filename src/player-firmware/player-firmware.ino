@@ -11,7 +11,7 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testDisplayInfo.h"  // #include "displayInfo.h"
-#include "themes/styleSheet-light.h"
+#include "themes/styleSheet-dark.h"
 // Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
 struct cursorTrack {
