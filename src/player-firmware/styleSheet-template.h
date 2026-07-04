@@ -52,7 +52,7 @@ const int MM_TXT_SZ = 2;
 // Spacing
 const int SM_MARGIN = 20;
 const float SM_LS = SINGLE;  // Sub Menu Line Spacing
-const int MAX_SM_LN = 11;  // Maximum Lines of Text to display on Sub Menu
+const int MAX_SM_LN = 10;  // Maximum Lines of Text to display on Sub Menu
 /// Sizing 
 const int SM_H_TXT_SZ = 6;
 const int SM_SH_TXT_SZ = 3;
@@ -61,9 +61,9 @@ const int SM_RET_TXT_SZ = 2;
 
 // Error
 // Colors
-#define ER_BG_C WHITE // Error Screen Background
-#define ER_H_TXT_C RED  // Error Screen Header Text
-#define ER_SH_TXT_C RED  // Error Screen Sub Header Text
+#define ER_BG_C RED // Error Screen Background
+#define ER_H_TXT_C WHITE  // Error Screen Header Text
+#define ER_SH_TXT_C BLACK  // Error Screen Sub Header Text
 #define ER_LG_TXT_C BLACK  // Error Screen Log Text
 // Spacing
 const int ER_MARGIN = 20;  // Error Screen Margins

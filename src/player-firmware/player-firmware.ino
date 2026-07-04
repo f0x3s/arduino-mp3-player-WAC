@@ -11,7 +11,7 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testDisplayInfo.h"  // #include "displayInfo.h"
-#include "styleSheet.h"
+#include "themes/styleSheet-spring.h"
 // Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
 struct cursorTrack {
@@ -304,7 +304,8 @@ void drawMainMenuBG() {
   tft.setCursor(MM_MARGIN, 20);
   tft.println("TRACK LISTING");
 
-  tft.drawFastHLine(MM_MARGIN - 5, 55, tft.width() - 2 * (MM_MARGIN - 5), MM_H_HR_C);
+  //tft.drawFastHLine(MM_MARGIN - 5, 55, tft.width() - 2 * (MM_MARGIN - 5), MM_H_HR_C);
+  tft.fillRect(MM_MARGIN - 5, 55,tft.width() - 2 * (MM_MARGIN - 5),5,MM_H_HR_C);
 
   tft.setTextSize(2);
   tft.setCursor(MM_MARGIN, 440);
@@ -327,12 +328,13 @@ void drawMainMenu() {
     int index = currentPage + i;
 
     if (index >= numMainMenuItems) break;
-
+    tft.setTextColor(MM_TXT_C);
     if (index == mainMenuPos) {
       tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
+      tft.setTextColor(MM_TXT_SL_C);
     }
 
-    tft.setTextColor(MM_TXT_C);
+    
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(index + 1);
     tft.print(". ");
@@ -389,7 +391,7 @@ void drawMainMenuUpdate() {
 
     yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
     tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
-    tft.setTextColor(MM_TXT_C);
+    tft.setTextColor(MM_TXT_SL_C);
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(mainMenuPos + 1);
     tft.print(". ");
