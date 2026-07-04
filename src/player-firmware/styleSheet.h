@@ -52,7 +52,7 @@ const int MM_TXT_SZ = 2;
 // Spacing
 const int SM_MARGIN = 20;
 const float SM_LS = SINGLE;  // Sub Menu Line Spacing
-const int MAX_SM_LN;  // Maximum Lines of Text to display on Sub Menu
+const int MAX_SM_LN = 11;  // Maximum Lines of Text to display on Sub Menu
 /// Sizing 
 const int SM_H_TXT_SZ = 6;
 const int SM_SH_TXT_SZ = 3;
