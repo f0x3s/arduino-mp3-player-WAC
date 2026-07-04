@@ -36,6 +36,7 @@ const int MM_MARGIN = 20;
 const float MM_LS = SINGLE;  // Main Menu Line Spacing
 /// Sizing 
 const int MM_H_TXT_SZ = 3;
+const int MM_MENU_SZ = 3;
 const int MM_TXT_SZ = 2;
 
 

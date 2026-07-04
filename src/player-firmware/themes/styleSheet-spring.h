@@ -38,6 +38,7 @@ const int MM_MARGIN = 20;
 const float MM_LS = SINGLE;  // Main Menu Line Spacing
 /// Sizing 
 const int MM_H_TXT_SZ = 3;
+const int MM_MENU_SZ = 3;
 const int MM_TXT_SZ = 2;
 
 
@@ -57,7 +58,7 @@ const float SM_LS = SINGLE;  // Sub Menu Line Spacing
 const int MAX_SM_LN = 10;  // Maximum Lines of Text to display on Sub Menu
 /// Sizing 
 const int SM_H_TXT_SZ = 6;
-const int SM_SH_TXT_SZ = 3;
+const int SM_SH_TXT_SZ = 4;
 const int SM_DES_TXT_SZ = 2;
 const int SM_RET_TXT_SZ = 2;
 

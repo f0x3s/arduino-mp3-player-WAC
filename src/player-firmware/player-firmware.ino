@@ -11,7 +11,7 @@
 #include <Encoder.h>
 #include "SparkFun_MY1690_MP3_Library.h"
 #include "testDisplayInfo.h"  // #include "displayInfo.h"
-#include "themes/styleSheet-spring.h"
+#include "themes/styleSheet-light.h"
 // Initialize TFT & graphics helpers
 MCUFRIEND_kbv tft;
 struct cursorTrack {
@@ -39,7 +39,7 @@ bool lastButton = false;
 // Tracklist located in displayInfo.h
 int numMainMenuItems = sizeof(menuItems) / sizeof(menuItems[0]);
 int maxDescChars = 0;
-const int TRACKS_PER_PAGE = 10;
+const int TRACKS_PER_PAGE = 8;
 int currentPage;
 int lastPage;
 
@@ -300,14 +300,14 @@ void drawMainMenuBG() {
   tft.fillScreen(MM_BG_C);
 
   tft.setTextColor(MM_H_TXT_C);
-  tft.setTextSize(3);
+  tft.setTextSize(MM_H_TXT_SZ);
   tft.setCursor(MM_MARGIN, 20);
   tft.println("TRACK LISTING");
 
   //tft.drawFastHLine(MM_MARGIN - 5, 55, tft.width() - 2 * (MM_MARGIN - 5), MM_H_HR_C);
   tft.fillRect(MM_MARGIN - 5, 55,tft.width() - 2 * (MM_MARGIN - 5),5,MM_H_HR_C);
 
-  tft.setTextSize(2);
+  tft.setTextSize(MM_TXT_SZ);
   tft.setCursor(MM_MARGIN, 440);
   tft.setTextColor(MM_PC_C);
   tft.print("Page ");
@@ -322,15 +322,15 @@ void drawMainMenuBG() {
 }
 
 void drawMainMenu() {
-  tft.setTextSize(2);
+  tft.setTextSize(MM_MENU_SZ);
   for (int i = 0; i < TRACKS_PER_PAGE; i++) {
-    int yPos = 80 + (i * 35);
+    int yPos = 80 + (i * 45);
     int index = currentPage + i;
 
     if (index >= numMainMenuItems) break;
     tft.setTextColor(MM_TXT_C);
     if (index == mainMenuPos) {
-      tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
+      tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 32, MM_HL_C);
       tft.setTextColor(MM_TXT_SL_C);
     }
 
@@ -343,7 +343,7 @@ void drawMainMenu() {
 }
 
 void drawMainMenuUpdate() {
-  tft.setTextSize(2);
+  tft.setTextSize(MM_MENU_SZ);
   int yPos;
 
   if (currentPage != lastPage) {
@@ -351,9 +351,9 @@ void drawMainMenuUpdate() {
 
     for (int i = 0; i < itemsOnLastPage; i++) {
       int index = lastPage + i;
-      yPos = 80 + (i * 35);
+      yPos = 80 + (i * 45);
       if (index == lastMainMenuPos) {
-        tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_BG_C);
+        tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 32, MM_BG_C);
       } else {
         tft.setCursor(MM_MARGIN + 5, yPos);
         tft.setTextColor(MM_BG_C);
@@ -362,6 +362,8 @@ void drawMainMenuUpdate() {
         tft.println(menuItems[index]);
       }
     }
+
+    tft.setTextSize(MM_TXT_SZ);
 
     String erase = "Page " + String((lastPage / 10) + 1);
     int16_t x1, y1;
@@ -381,16 +383,16 @@ void drawMainMenuUpdate() {
     drawMainMenu();
 
   } else {
-    yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_BG_C);
+    yPos = 80 + ((lastMainMenuPos % TRACKS_PER_PAGE) * 45);
+    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 32, MM_BG_C);
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.setTextColor(MM_TXT_C);
     tft.print(lastMainMenuPos + 1);
     tft.print(". ");
     tft.println(menuItems[lastMainMenuPos]);
 
-    yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 35);
-    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 28, MM_HL_C);
+    yPos = 80 + ((mainMenuPos % TRACKS_PER_PAGE) * 45);
+    tft.fillRect(MM_MARGIN - 5, yPos - 5, tft.width() - 2 * (MM_MARGIN - 5), 32, MM_HL_C);
     tft.setTextColor(MM_TXT_SL_C);
     tft.setCursor(MM_MARGIN + 5, yPos);
     tft.print(mainMenuPos + 1);
@@ -411,13 +413,14 @@ void drawSubMenu() {
   tft.setTextSize(3);
   tft.setCursor(SM_MARGIN, 40);
 
-  cP = drawWrappedText("Now Playing",
+  cP = drawWrappedText("Now Playing:",
         SM_MARGIN, 2 * SM_MARGIN,
         SM_MARGIN,
         SM_H_TXT_C,
         SM_H_TXT_SZ);
 
-  String itemName = String(mainMenuPos + 1) + ". " + String(menuItems[mainMenuPos]);
+  //String itemName = String(mainMenuPos + 1) + ". " + String(menuItems[mainMenuPos]);
+  String itemName = String(menuItems[mainMenuPos]);
   cP = drawWrappedText(itemName,
         SM_MARGIN,
         cP.y + (SM_LS * cP.lh),
@@ -429,7 +432,7 @@ void drawSubMenu() {
 
   cP = drawPagedWrappedText(desc[mainMenuPos],
         SM_MARGIN,
-        cP.y + (SM_LS * 2 * cP.lh),
+        cP.y + (SM_LS * 1.5 * cP.lh),
         SM_MARGIN,
         SM_DES_TXT_C,
         SM_DES_TXT_SZ,
@@ -467,7 +470,7 @@ void drawSubMenuUpdate() {
   cursorTrack cP;
   cP = drawPagedWrappedText(desc[mainMenuPos],
         SM_MARGIN,
-        subCP.y + (SM_LS * 2 * subCP.lh),
+        subCP.y + (SM_LS * 1.5 * subCP.lh),
         SM_MARGIN,
         SM_BG_C,
         SM_DES_TXT_SZ,
@@ -476,7 +479,7 @@ void drawSubMenuUpdate() {
 
   cP = drawPagedWrappedText(desc[mainMenuPos],
         SM_MARGIN,
-        subCP.y + (SM_LS * 2 * subCP.lh),
+        subCP.y + (SM_LS * 1.5 * subCP.lh),
         SM_MARGIN,
         SM_DES_TXT_C,
         SM_DES_TXT_SZ,
