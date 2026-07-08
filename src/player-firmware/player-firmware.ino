@@ -13,6 +13,7 @@
 #include "testDisplayInfo.h"  // #include "displayInfo.h"
 #include "themes/styleSheet-dark.h"
 // Initialize TFT & graphics helpers
+
 MCUFRIEND_kbv tft;
 struct cursorTrack {
   int y;
@@ -106,12 +107,9 @@ void setup() {
     mp3.setPlayModeSingle();
   }
 
-
-
   for(int i = 0; i < numMainMenuItems; i++) {
     if (strlen(desc[i]) > maxDescChars) maxDescChars = strlen(desc[i]);
   }
-
 
   if (displayState != ERROR) displayState = MAIN_MENU;
   mp3.playTrackNumber(mainMenuPos + 1);
@@ -229,6 +227,7 @@ int checkTrackCount() {
   }
   return trackCount;
 }
+
 void checkCard() {
   bool cardInserted = digitalRead(CD_PIN) == LOW;
 

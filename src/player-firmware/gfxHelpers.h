@@ -91,7 +91,7 @@ cursorTrack drawPagedWrappedText(String text, int startX, int startY, int margin
     linePos = 0;
   }
 
-  // ---------- FIRST PASS: COUNT WRAPPED LINES ----------
+  // first pass: count wrapped lines
   int cursorX = startX;
   int totalLines = 1;
 
@@ -162,7 +162,7 @@ cursorTrack drawPagedWrappedText(String text, int startX, int startY, int margin
   int startLine = linePos * textLinesPerPage;
   int endLine = startLine + textLinesPerPage;
 
-  // ---------- SECOND PASS: DRAW CURRENT PAGE ----------
+  // second pass: draw current page
   cursorX = startX;
   int cursorY = startY;
   int currentLine = 0;

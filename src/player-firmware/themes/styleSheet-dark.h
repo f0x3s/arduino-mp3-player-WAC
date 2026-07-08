@@ -32,7 +32,7 @@
 #define MM_PC_C GRAY  // Main Menu Page Count
 #define MM_NP_C GREEN // Main Menu Now Playing
 // Spacing
-const int MM_MARGIN = 20;
+const int MM_MARGIN = 30;
 const float MM_LS = SINGLE;  // Main Menu Line Spacing
 /// Sizing 
 const int MM_H_TXT_SZ = 3;
