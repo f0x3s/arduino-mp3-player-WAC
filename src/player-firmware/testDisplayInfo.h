@@ -10,7 +10,7 @@ const char* menuItems[] = {
   "Liszt 9",
   "Liszt 10",
   "Liszt 11",
-  "Liszt 12",
+  "Liszt 12"
 };
 
 // Sourced from: https://www.britannica.com/biography/Franz-Liszt
